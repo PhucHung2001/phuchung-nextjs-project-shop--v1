@@ -36,7 +36,7 @@
 .title a:hover,
 .title a:focus,
 .title a:active {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .title {
@@ -72,7 +72,10 @@
   flex-wrap: wrap;
   max-width: 800px;
 }
-
+img.imagebannehero:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
 .card {
   margin: 1rem;
   padding: 1.5rem;
@@ -115,15 +118,8 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  .card,
-  .footer {
-    border-color: #222;
-  }
-  .code {
-    background: #111;
-  }
-  .logo img {
-    filter: invert(1);
-  }
+.th,
+.td,
+.tr {
+  border: 1px solid black;
 }

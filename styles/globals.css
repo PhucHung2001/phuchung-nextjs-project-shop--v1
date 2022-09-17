@@ -2,8 +2,8 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+    Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
@@ -14,7 +14,20 @@ a {
 * {
   box-sizing: border-box;
 }
-
+.navbar {
+  transition: 0.4s all;
+  overflow: visible !important;
+}
+.navbar.active {
+  position: fixed;
+  background-color: #fff;
+  z-index: 100;
+  top: 0;
+  width: 100%;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 20%);
+  left: 0;
+  padding: 1.2vmax 90px;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
