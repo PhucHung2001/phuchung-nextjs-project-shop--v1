@@ -35,6 +35,11 @@ export function HeaderDesktop() {
   const goToCart = () => {
     router.push('/cart')
   }
+  // const circleOfNumbers = (n, firstNumber) => {
+  //   return (firstNumber + n / 2) % n
+  // }
+  // circleOfNumbers(10, 2)
+  // console.log(circleOfNumbers(10, 2))
   const queryChangeHandler = (e) => {}
   return (
     <>
@@ -97,16 +102,23 @@ export function HeaderDesktop() {
           <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Box
               sx={{
-                display: { xs: 'none', sm: 'block' },
+                display: { xs: 'block', sm: 'block' },
               }}
             >
               <form onSubmit={submitHandler} style={{ marginLeft: '-10px' }}>
-                <IconButton type="submit" aria-label="search">
+                <IconButton
+                  type="submit"
+                  aria-label="search"
+                  sx={{
+                    display: { xs: 'none', sm: 'inline-block' },
+                  }}
+                >
                   <SearchIcon />
                 </IconButton>
                 <InputBase
                   name="query"
                   placeholder="Search products"
+                  fontSize="11px"
                   onChange={queryChangeHandler}
                 />
               </form>
@@ -148,7 +160,7 @@ export function HeaderDesktop() {
                   direction="row"
                   alignItems="center"
                   justifyContent="space-between"
-                  style={{ marginLeft: '30px', cursor: 'pointer' }}
+                  style={{ marginLeft: '10px', cursor: 'pointer' }}
                   onClick={goToCart}
                 >
                   <Box>
@@ -166,54 +178,6 @@ export function HeaderDesktop() {
         </Container>
       </Box>
       <HeaderMain />
-      {/* <Box
-        sx={{ display: { xs: 'block', sm: 'block' } }}
-        py="13px"
-        style={{
-          backgroundColor: '#323030',
-          position: 'sticky',
-          top: 0,
-          right: 0,
-          left: 0,
-          zIndex: 10,
-        }}
-      >
-        <Container>
-          <Stack direction="row" justifyContent="space-between">
-            <Box>
-              {ROUTES_LIST.map((route) => (
-                <Link key={route.path} href={route.path} passHref>
-                  <MuiLink
-                    sx={{
-                      mr: 4,
-                      fontWeight: 'medium',
-                      color: 'white',
-                      fontSize: '15px',
-                      fontWeight: '500',
-                      letterSpacing: 0.7,
-                    }}
-                    className={clsx({ active: router.pathname === route.path })}
-                  >
-                    {route.label}
-                  </MuiLink>
-                </Link>
-              ))}
-            </Box>
-            <Box>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <Box>
-                  <LightbulbCircleIcon style={{ color: 'cc9966', marginRight: '10px' }} />
-                </Box>
-                <Box>
-                  <Typography style={{ color: 'white', fontSize: '15px' }}>
-                    CLEARANCE UP TO 30% OFF
-                  </Typography>
-                </Box>
-              </Stack>
-            </Box>
-          </Stack>
-        </Container>
-      </Box> */}
     </>
   )
 }
