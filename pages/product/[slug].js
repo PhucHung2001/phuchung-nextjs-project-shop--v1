@@ -87,7 +87,7 @@ export default function ProductScreen() {
                 </Typography>
               </ListItem>
               <ListItem>
-                <Typography style={{ color: '#777' }}>${product.description}</Typography>
+                <Typography style={{ color: '#777' }}>{product.description}</Typography>
               </ListItem>
               <ListItem style={{ borderBottom: '1px solid #ddd', paddingBottom: '30px' }}>
                 <Stack direction="row" spacing={2}>
