@@ -1,0 +1,8 @@
+.pageHeader {
+  background-image: url('../public/assets/images/page-header-bg.jpg');
+  background-size: cover;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  padding: 50px 0px;
+  text-align: center;
+}

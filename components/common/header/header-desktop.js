@@ -10,8 +10,7 @@ import {
 } from '@mui/material'
 import Link from 'next/link'
 import { Router, useRouter } from 'next/router'
-import * as React from 'react'
-import { ROUTES_LIST } from './routes'
+import React, { useEffect } from 'react'
 import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined'
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined'
 import TwitterIcon from '@mui/icons-material/Twitter'
@@ -22,9 +21,12 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { Store } from '../../../utils/Store'
 import logoShop from '../../../assets/images/PHMovie__1___1___1_-removebg-preview.png'
+import { useContext } from 'react'
+
 const HeaderMain = dynamic(() => import('../header/headerMain'), { ssr: false })
-export function HeaderDesktop() {
+function HeaderDesktop() {
   const router = useRouter()
   const submitHandler = (e) => {
     e.preventDefault()
@@ -35,11 +37,9 @@ export function HeaderDesktop() {
   const goToCart = () => {
     router.push('/cart')
   }
-  // const circleOfNumbers = (n, firstNumber) => {
-  //   return (firstNumber + n / 2) % n
-  // }
-  // circleOfNumbers(10, 2)
-  // console.log(circleOfNumbers(10, 2))
+  const { state, dispatch } = useContext(Store)
+  const { cart } = state
+  const cartLength = cart.cartItems.length
   const queryChangeHandler = (e) => {}
   return (
     <>
@@ -123,7 +123,7 @@ export function HeaderDesktop() {
                 />
               </form>
             </Box>
-            <Box>
+            <Box sx={{ marginRight: { xs: '55px', sm: '105px' } }}>
               <Link href="/" passHref>
                 <MuiLink>
                   <Image src={logoShop} width={150} height={80} />
@@ -164,11 +164,11 @@ export function HeaderDesktop() {
                   onClick={goToCart}
                 >
                   <Box>
-                    <Badge badgeContent={4} color="primary">
+                    <Badge badgeContent={cart.cartItems.length} color="primary">
                       <ShoppingCartOutlinedIcon color="action" />
                     </Badge>
                   </Box>
-                  <Box style={{ marginLeft: '10px' }}>
+                  <Box style={{ marginLeft: '5px' }}>
                     <Typography style={{ fontSize: '15px' }}>Cart</Typography>
                   </Box>
                 </Stack>
@@ -181,3 +181,4 @@ export function HeaderDesktop() {
     </>
   )
 }
+export default dynamic(() => Promise.resolve(HeaderDesktop), { ssr: false })

@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React from 'react'
+import React, { useContext } from 'react'
 import Box from '@mui/material/Box'
 import { MainLayout } from '../components/layout/main'
 import Carousel from 'react-material-ui-carousel'
@@ -16,8 +16,6 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  List,
-  ListItem,
   Stack,
   Typography,
 } from '@mui/material'
@@ -43,10 +41,15 @@ import post2 from '../assets/images/post_2_15815069af.jpg'
 import post3 from '../assets/images/post_3_0a6ccce5a4.jpg'
 import data from '../utils/data'
 import NextLink from 'next/link'
-
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-export default function Home() {
+import db from '../utils/db'
+import Product from '../models/Product'
+import { Store } from '../utils/Store'
+import axios from 'axios'
+import styles from '../styles/HomePage.module.css'
+export default function Home(props) {
+  const { featuredProducts, topRatedProducts } = props
   const IMAGE_BANNER = [
     {
       src: slider1,
@@ -64,11 +67,33 @@ export default function Home() {
     speed: 500,
     rows: 1,
   }
-  const sum = (a, b) => {
-    return a + b
-  }
+  const slickImage = [
+    { path: slick1 },
+    { path: slick2 },
+    { path: slick3 },
+    { path: slick4 },
+    { path: slick5 },
+    { path: slick6 },
+    { path: slick7 },
+    { path: slick8 },
+    { path: slick9 },
+  ]
 
-  console.log(sum(2, 3, 5, 8))
+  const { state, dispatch } = useContext(Store)
+  const { cart } = state
+  // const addToCartHandle = async () => {
+  //   const existItem = state.cart.cartItems.find((x) => x._id === product._id)
+  //   const quantity = existItem ? existItem.quantity + 1 : 1
+  //   const { data } = await axios.get(`/api/products/${product._id}`)
+  //   if (data.countInStock < quantity) {
+  //     setLoading(false)
+  //     enqueueSnackbar('Sorry.Product out of stock', { variant: 'error' })
+
+  //     return
+  //   }
+  //   dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } })
+  //   enqueueSnackbar('Product added to cart', { variant: 'success' })
+  // }
 
   return (
     <Box>
@@ -186,39 +211,36 @@ export default function Home() {
                 </Typography>
               </Box>
               <Box>
-                <a href="#container">
-                  <button
-                    type="submit"
-                    style={{
-                      width: '135px',
-                      height: '50px',
-                      border: 'none',
-                      background: '#cc9966',
-                      margin: '20px 0',
-                      fontSize: '1.2vmax',
-                      color: '#fff',
-                      cursor: 'pointer',
-                    }}
-                    className="Home__button"
-                  >
-                    SHOP NOW
-                  </button>
-                </a>
+                <Button
+                  variant="contained"
+                  style={{
+                    width: '135px',
+                    height: '50px',
+                    margin: '20px 0',
+
+                    color: '#fff',
+                    cursor: 'pointer',
+                  }}
+                  sx={{ fontSize: { xs: '15px', sm: '18px' } }}
+                  className="Home__button"
+                >
+                  SHOP NOW
+                </Button>
               </Box>
             </Box>
           </Box>
         </Box>
 
         <HeroBannerImg />
-        <Box style={{ margin: '50px 0px' }}>
+        <Box style={{ marginTop: '50px', marginBottom: '100px' }}>
           <Container>
             <Stack direction="row" justifyContent="center" style={{ marginBottom: '50px' }}>
               <Typography component="h2" variant="h5" style={{ fontWeight: 'bold' }}>
-                TOP RATED PRODUCTS
+                FEATURED PRODUCTS
               </Typography>
             </Stack>
             <Grid container spacing={3}>
-              {data.products.map((product) => (
+              {featuredProducts.map((product) => (
                 <Grid item md={3} xs={6} key={product.name}>
                   <Card>
                     <NextLink href={`/product/${product.slug}`} passHref>
@@ -227,7 +249,7 @@ export default function Home() {
                           component="img"
                           image={product.image}
                           title={product.name}
-                          height="315"
+                          sx={{ height: { xs: '230px', sm: '350px' } }}
                         ></CardMedia>
                       </CardActionArea>
                     </NextLink>
@@ -237,7 +259,11 @@ export default function Home() {
                         <Typography style={{ fontSize: '13px', opacity: '0.5' }}>
                           {product.category}
                         </Typography>
-                        <Typography>{product.name}</Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: '14px', sm: '17px' }, fontWeight: 'bold' }}
+                        >
+                          {product.name}
+                        </Typography>
                         <CardActions>${product.price}</CardActions>
                         <Button size="small" variant="text">
                           Add to cart
@@ -250,15 +276,9 @@ export default function Home() {
             </Grid>
           </Container>
         </Box>
-        <Box style={{ width: '100%', position: 'relative' }}>
-          <Image src={bg1} height="800px" style={{ transform: 'scale(1.2)' }} />
+        <Box className={styles.deal}>
           <Box
             style={{
-              position: 'absolute',
-              top: '280px',
-              bottom: 0,
-              height: '20%',
-              left: '34%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -266,7 +286,7 @@ export default function Home() {
               zIndex: '10',
             }}
           >
-            <Box display={{ xs: 'none', sm: 'none', md: 'block', textAlign: 'center' }}>
+            <Box display={{ xs: 'block', sm: 'block', md: 'block', textAlign: 'center' }}>
               <Typography component="h5" variant="h8" color="#c96" fontWeight="300">
                 LIMITED QUANTITIES.
               </Typography>
@@ -285,7 +305,7 @@ export default function Home() {
               <Typography component="h2" variant="h5" marginTop="20px" fontWeight="bold">
                 SHOP NOW
               </Typography>
-              <Stack direction="row">
+              <Stack direction="row" spacing={1} padding="0px 20px">
                 <Stack direction="column" alignItems="center">
                   <Image src={product1} width={250} height={300} />
                   <Box style={{ marginTop: '-20px' }}>
@@ -297,7 +317,7 @@ export default function Home() {
                 <Stack direction="column" alignItems="center">
                   <Image src={product2} width={250} height={300} />
                   <Box style={{ marginTop: '-20px' }}>
-                    <Typography>Elasticated cotton shorts</Typography>
+                    <Typography>Elasticated shorts</Typography>
                     <Typography>$8.89</Typography>
                     <Button variant="text">Shop Now</Button>
                   </Box>
@@ -306,10 +326,10 @@ export default function Home() {
             </Box>
           </Box>
         </Box>
-        <Box style={{ backgroundColor: '#222222', color: 'white' }}>
+        <Box style={{ backgroundColor: '#222222', color: 'white', marginTop: '80px' }}>
           <Container>
             <Grid container spacing={2} style={{ padding: '40px 0px' }}>
-              <Grid item md={3} xs={6}>
+              <Grid item md={3} xs={12}>
                 <Stack direction="column" alignItems="center" spacing={1}>
                   <LocalShippingOutlinedIcon style={{ fontSize: '35px', color: '#c96' }} />
                   <Typography component="h3" variant="h7">
@@ -320,7 +340,7 @@ export default function Home() {
                   </Typography>
                 </Stack>
               </Grid>
-              <Grid item md={3} xs={6} textAlign="center">
+              <Grid item md={3} xs={12} textAlign="center">
                 <Stack direction="column" alignItems="center" spacing={1}>
                   <RotateRightOutlinedIcon style={{ fontSize: '35px', color: '#c96' }} />
                   <Typography component="h3" variant="h7">
@@ -331,7 +351,7 @@ export default function Home() {
                   </Typography>
                 </Stack>
               </Grid>
-              <Grid item md={3} xs={6} textAlign="center">
+              <Grid item md={3} xs={12} textAlign="center">
                 <Stack direction="column" alignItems="center" spacing={1}>
                   <LockOpenOutlinedIcon style={{ fontSize: '35px', color: '#c96' }} />
                   <Typography component="h3" variant="h7">
@@ -342,7 +362,7 @@ export default function Home() {
                   </Typography>
                 </Stack>
               </Grid>
-              <Grid item md={3} xs={6} textAlign="center">
+              <Grid item md={3} xs={12} textAlign="center">
                 <Stack direction="column" alignItems="center" spacing={1}>
                   <HeadphonesOutlinedIcon style={{ fontSize: '35px', color: '#c96' }} />
                   <Typography component="h3" variant="h7">
@@ -356,9 +376,48 @@ export default function Home() {
             </Grid>
           </Container>
         </Box>
-        <Box style={{ minHeight: '50vh' }}>
-          <Container style={{ borderBottom: '1px solid #444' }}>
-            <Typography>New Arrival</Typography>
+        <Box style={{ margin: '50px 0px' }}>
+          <Container>
+            <Stack direction="row" justifyContent="center" style={{ marginBottom: '50px' }}>
+              <Typography component="h2" variant="h5" style={{ fontWeight: 'bold' }}>
+                TOP RATED PRODUCTS
+              </Typography>
+            </Stack>
+            <Grid container spacing={3}>
+              {topRatedProducts.map((product) => (
+                <Grid item md={3} xs={6} key={product.name}>
+                  <Card>
+                    <NextLink href={`/product/${product.slug}`} passHref>
+                      <CardActionArea>
+                        <CardMedia
+                          component="img"
+                          image={product.image}
+                          title={product.name}
+                          sx={{ height: { xs: '230px', sm: '350px' } }}
+                        ></CardMedia>
+                      </CardActionArea>
+                    </NextLink>
+
+                    <CardContent>
+                      <Stack direction="column" alignItems="center">
+                        <Typography style={{ fontSize: '13px', opacity: '0.5' }}>
+                          {product.category}
+                        </Typography>
+                        <Typography
+                          sx={{ fontSize: { xs: '14px', sm: '17px' }, fontWeight: 'bold' }}
+                        >
+                          {product.name}
+                        </Typography>
+                        <CardActions>${product.price}</CardActions>
+                        <Button size="small" variant="text">
+                          Add to cart
+                        </Button>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           </Container>
         </Box>
         <Box>
@@ -369,54 +428,11 @@ export default function Home() {
               </Typography>
             </Stack>
             <Slider {...settings}>
-              <Box>
-                <Image src={slick1} />
-              </Box>
-              <Box>
-                <Image src={slick2} />
-              </Box>
-              <Box>
-                <Image src={slick3} />
-              </Box>
-              <Box>
-                <Image src={slick4} />
-              </Box>
-              <Box>
-                <Image src={slick5} />
-              </Box>
-              <Box>
-                <Image src={slick6} />
-              </Box>
-              <Box>
-                <Image src={slick7} />
-              </Box>
-              <Box>
-                <Image src={slick8} />
-              </Box>
-              <Box>
-                <Image src={slick9} />
-              </Box>
-              <Box>
-                <Image src={slick1} />
-              </Box>
-              <Box>
-                <Image src={slick2} />
-              </Box>
-              <Box>
-                <Image src={slick3} />
-              </Box>
-              <Box>
-                <Image src={slick4} />
-              </Box>
-              <Box>
-                <Image src={slick5} />
-              </Box>
-              <Box>
-                <Image src={slick6} />
-              </Box>
-              <Box>
-                <Image src={slick7} />
-              </Box>
+              {slickImage.map((item) => (
+                <Box key={item.path}>
+                  <Image src={item.path} />
+                </Box>
+              ))}
             </Slider>
           </Container>
         </Box>
@@ -513,3 +529,20 @@ export default function Home() {
   )
 }
 Home.Layout = MainLayout
+export async function getServerSideProps() {
+  await db.connect()
+  const featuredProductsDocs = await Product.find({ isFeatured: true }, '-reviews').lean().limit(4)
+  const topRatedProductsDocs = await Product.find({}, '-reviews')
+    .lean()
+    .sort({
+      rating: -1,
+    })
+    .limit(4)
+  await db.disconnect()
+  return {
+    props: {
+      featuredProducts: featuredProductsDocs.map(db.convertDocToObj),
+      topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj),
+    },
+  }
+}

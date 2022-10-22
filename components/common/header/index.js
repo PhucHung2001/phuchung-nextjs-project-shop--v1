@@ -1,5 +1,5 @@
-import React from 'react'
-import { HeaderDesktop } from './header-desktop'
+import React, { useContext } from 'react'
+import HeaderDesktop from './header-desktop'
 
 export function Header() {
   return (

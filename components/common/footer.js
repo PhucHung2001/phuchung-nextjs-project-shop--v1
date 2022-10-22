@@ -36,7 +36,7 @@ export function Footer() {
                   </Typography>
                 </ListItem>
               </List>
-              <Stack direction="row" justifyContent={{ xs: 'center', sm: 'start' }}>
+              <Stack direction="row" justifyContent={{ xs: 'start', sm: 'start' }}>
                 {socialLinks.map((item, idx) => (
                   <Box
                     key={idx}

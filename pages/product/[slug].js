@@ -1,20 +1,18 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import {
-  Badge,
-  Box,
   Button,
   Container,
   Grid,
-  IconButton,
-  InputBase,
   Link as MuiLink,
   List,
   ListItem,
   Stack,
   Typography,
 } from '@mui/material'
+import { useSnackbar } from 'notistack'
 import React from 'react'
+import axios from 'axios'
 import { MainLayout } from '../../components/layout/main'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 import data from '../../utils/data'
@@ -22,12 +20,33 @@ import Link from 'next/link'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import Image from 'next/image'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
-export default function ProductScreen() {
+import db from '../../utils/db'
+import Product from '../../models/Product'
+import { useContext } from 'react'
+import { Store } from '../../utils/Store'
+export default function ProductScreen(props) {
+  const { product } = props
   const router = useRouter()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const { slug } = router.query
-  const product = data.products.find((a) => a.slug === slug)
+  const { state, dispatch } = useContext(Store)
+  // const product = data.products.find((a) => a.slug === slug)
   if (!product) {
     return <div>Not found</div>
+  }
+  console.log(state.cart)
+  const addToCartHandle = async () => {
+    const existItem = state.cart.cartItems.find((x) => x._id === product._id)
+    const quantity = existItem ? existItem.quantity + 1 : 1
+    const { data } = await axios.get(`/api/products/${product._id}`)
+    if (data.countInStock < quantity) {
+      setLoading(false)
+      enqueueSnackbar('Sorry.Product out of stock', { variant: 'error' })
+
+      return
+    }
+    dispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } })
+    enqueueSnackbar('Product added to cart', { variant: 'success' })
   }
   return (
     <Container style={{ paddingTop: '20px', paddingBottom: '30px' }}>
@@ -91,7 +110,7 @@ export default function ProductScreen() {
               </ListItem>
               <ListItem style={{ borderBottom: '1px solid #ddd', paddingBottom: '30px' }}>
                 <Stack direction="row" spacing={2}>
-                  <Button variant="contained" style={{ padding: '10px' }}>
+                  <Button variant="contained" style={{ padding: '10px' }} onClick={addToCartHandle}>
                     <AddShoppingCartIcon />
                     <Typography style={{ fontSize: '15px', marginLeft: '5px' }}>
                       ADD TO CART
@@ -114,3 +133,16 @@ export default function ProductScreen() {
   )
 }
 ProductScreen.Layout = MainLayout
+export async function getServerSideProps(context) {
+  const { params } = context
+  const { slug } = params
+
+  await db.connect()
+  const product = await Product.findOne({ slug }, '-reviews').lean()
+  await db.disconnect()
+  return {
+    props: {
+      product: db.convertDocToObj(product),
+    },
+  }
+}
